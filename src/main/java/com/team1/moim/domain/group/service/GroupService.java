@@ -172,7 +172,10 @@ public class GroupService {
                     log.info("추천 일정: " + recommendEvents);
                     recommendEvents.forEach(recommendEvent -> {
                         try {
-                            redisService.setAvailableList(group.getId().toString(), recommendEvent);
+//                            if (!recommendEvents.contains(recommendEvent)) {
+                            if (redisService.getAvailableList(String.valueOf(group.getId())).isEmpty()) {
+                                redisService.setAvailableList(group.getId().toString(), recommendEvent);
+                            }
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
@@ -373,7 +376,8 @@ public class GroupService {
                     List<AvailableResponse> existingEvents = redisService.getAvailableList(groupId.toString());
 
                     // 추천된 이벤트가 리스트에 이미 있는지 확인합니다
-                    if (!existingEvents.contains(recommendEvent)) {
+//                    if (!existingEvents.contains(recommendEvent)) {
+                        if (redisService.getAvailableList(groupId.toString()).isEmpty()) {
                         // 이벤트가 없을 경우 Redis에 추가합니다
                         redisService.setAvailableList(groupId.toString(), recommendEvent);
                     }
